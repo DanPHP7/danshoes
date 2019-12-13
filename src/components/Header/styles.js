@@ -6,24 +6,27 @@ export const Container = styled.View`
   flex-direction: row;
   justify-content: space-between;
   padding: 15px;
-  height: 50px;
+  max-height: 50px;
+  margin-bottom: 10px;
 `;
 
-export const LogoImage = styled.Image`
-  height: 35;
-`;
+export const LogoImage = styled.Image``;
 
-export const RedirectHome = styled(RectButton)``;
+export const RedirectHome = styled(RectButton)`
+  height: 40px;
+`;
 export const RedirectCart = styled(RectButton)`
-  align-items: center;
+  height: 40px;
 `;
 
 export const CartCount = styled.Text`
   width: 17px;
   height: 17px;
   border-radius: 10px;
-  top: -8px;
+  top: -3px;
+  right: -5px;
   color: #fff;
-  background: #04d361;
+  background: #da552f;
   text-align: center;
+  position: absolute;
 `;
