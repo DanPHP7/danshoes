@@ -105,3 +105,11 @@ export const TextButton = styled.Text`
   font-size: 18px;
   text-align: center;
 `;
+export const EmptyCart = styled.View`
+  align-items: center;
+`;
+export const TextEmpty = styled.Text`
+  font-size: 20px;
+  font-weight: bold;
+  color: #999;
+`;

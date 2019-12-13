@@ -1,4 +1,5 @@
 import React from 'react';
+import { connect } from 'react-redux';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import PropTypes from 'prop-types';
 import Logo from '../../assets/images/logo.png';
@@ -10,7 +11,7 @@ import {
   CartCount,
 } from './styles';
 
-export default function Header({ navigation }) {
+function Header({ navigation, cartSize }) {
   const { navigate } = navigation;
   return (
     <Container>
@@ -19,7 +20,7 @@ export default function Header({ navigation }) {
       </RedirectHome>
       <RedirectCart onPress={() => navigate('Cart')}>
         <Icon name="shopping-basket" size={35} color="#FFF" />
-        <CartCount>3</CartCount>
+        <CartCount>{cartSize || 0}</CartCount>
       </RedirectCart>
     </Container>
   );
@@ -29,3 +30,10 @@ Header.propTypes = {
     navigate: PropTypes.func,
   }).isRequired,
 };
+
+export default connect(
+  state => ({
+    cartSize: state.cart.length,
+  }),
+  null
+)(Header);

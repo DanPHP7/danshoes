@@ -1,5 +1,10 @@
 import React from 'react';
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import * as CartActions from '../../store/modules/cart/actions';
+
+import { formatPrice } from '../../util/formatPrice';
 import {
   Container,
   Products,
@@ -20,51 +25,96 @@ import {
   ButtonFinalizar,
   TotalTitle,
   TextButton,
+  EmptyCart,
+  TextEmpty,
 } from './styles';
 
-export default function Cart() {
+function Cart({ products, total, removeFromCart, updateAmountRequest }) {
+  function increment(product) {
+    updateAmountRequest(product.id, product.amount + 1);
+  }
+
+  function decrement(product) {
+    updateAmountRequest(product.id, product.amount - 1);
+  }
   return (
     <Container>
-      <Products>
-        <InfoContainer>
-          <ProductImage
-            source={{
-              uri:
-                'https://rocketseat-cdn.s3-sa-east-1.amazonaws.com/modulo-redux/tenis1.jpg',
-            }}
-          />
-          <InfoProduct>
-            <Title>Titulo</Title>
-            <Price>R$ 179,90</Price>
-          </InfoProduct>
+      {products.length ? (
+        <>
+          {products.map(product => (
+            <Products key={product.id}>
+              <InfoContainer>
+                <ProductImage
+                  source={{
+                    uri: product.image,
+                  }}
+                />
+                <InfoProduct>
+                  <Title>{product.title}</Title>
+                  <Price>{product.priceFormatted}</Price>
+                </InfoProduct>
 
-          <RemoveButton>
-            <Icon name="delete-forever" size={24} color="#f00" />
-          </RemoveButton>
-        </InfoContainer>
-        <FooterProduct>
-          <ActionsContainer>
-            <SubButton>
-              <Icon name="remove-circle-outline" size={20} color="#04d361" />
-            </SubButton>
+                <RemoveButton onPress={() => removeFromCart(product.id)}>
+                  <Icon name="delete-forever" size={24} color="#f00" />
+                </RemoveButton>
+              </InfoContainer>
 
-            <AmountPerProduct>3</AmountPerProduct>
-            <AddButton>
-              <Icon name="add-circle-outline" size={20} color="#04d361" />
-            </AddButton>
-          </ActionsContainer>
+              <FooterProduct>
+                <ActionsContainer>
+                  <SubButton onPress={() => decrement(product)}>
+                    <Icon
+                      name="remove-circle-outline"
+                      size={20}
+                      color="#04d361"
+                    />
+                  </SubButton>
 
-          <TotalPerProduct>R$539, 70</TotalPerProduct>
-        </FooterProduct>
-      </Products>
+                  <AmountPerProduct>{product.amount}</AmountPerProduct>
+                  <AddButton onPress={() => increment(product)}>
+                    <Icon name="add-circle-outline" size={20} color="#04d361" />
+                  </AddButton>
+                </ActionsContainer>
 
-      <FooterContainer>
-        <TotalTitle>TOTAL</TotalTitle>
-        <TotalPrice>R$1619,10</TotalPrice>
-        <ButtonFinalizar>
-          <TextButton>FINALIZAR PEDIDO</TextButton>
-        </ButtonFinalizar>
-      </FooterContainer>
+                <TotalPerProduct>{product.subtotal}</TotalPerProduct>
+              </FooterProduct>
+            </Products>
+          ))}
+          <FooterContainer>
+            <TotalTitle>TOTAL</TotalTitle>
+            <TotalPrice>{total}</TotalPrice>
+            <ButtonFinalizar>
+              <TextButton>FINALIZAR PEDIDO</TextButton>
+            </ButtonFinalizar>
+          </FooterContainer>
+        </>
+      ) : (
+        <EmptyCart>
+          <Icon name="remove-shopping-cart" size={64} color="#eee" />
+          <TextEmpty>Carrinho Vazio.</TextEmpty>
+        </EmptyCart>
+      )}
     </Container>
   );
 }
+
+const mapStateToProps = state => ({
+  products: state.cart.map(product => ({
+    ...product,
+    subtotal: formatPrice(product.price * product.amount),
+    priceFormatted: formatPrice(product.price),
+  })),
+  total: formatPrice(
+    state.cart.reduce(
+      (total, product) => total + product.price * product.amount,
+      0
+    )
+  ),
+});
+
+const mapDispatchToProps = dispatch =>
+  bindActionCreators(CartActions, dispatch);
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(Cart);
